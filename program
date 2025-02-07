@@ -1,0 +1,38 @@
+//pinescript
+//@version=6
+strategy("Stratégie Combinée - Détection de motifs et Ichimoku", overlay=true)
+
+// --- Paramètres ---
+lookback = input.int(10, title="Nombre de bougies pour la détection de motifs")
+
+// --- Fonctions de détection de motifs ---
+// ... (Copiez ici les fonctions de détection de motifs du premier code) ...
+
+// --- Paramètres Ichimoku ---
+conversionPeriods = input.int(9, minval=1, title="Conversion Line Periods")
+basePeriods = input.int(26, minval=1, title="Base Line Periods")
+laggingSpan2Periods = input.int(52, minval=1, title="Lagging Span 2 Periods")
+displacement = input.int(26, minval=1, title="Displacement")
+
+// --- Calcul des lignes Ichimoku ---
+conversionLine = ta.ema(close, conversionPeriods)
+baseLine = ta.ema(close, basePeriods)
+leadingSpanA = (conversionLine + baseLine) / 2
+leadingSpanB = ta.ema(high, laggingSpan2Periods)
+
+// --- Décalage des lignes Leading Span ---
+plot(leadingSpanA, offset = displacement, color=color.new(color.blue, transp=70), title="Leading Span A")
+plot(leadingSpanB, offset = displacement, color=color.new(color.orange, transp=70), title="Leading Span B")
+
+// --- Nuage Ichimoku (Kumo) - Couleurs contrastées ---
+fill(plot(leadingSpanA, offset = displacement), 
+     plot(leadingSpanB, offset = displacement), 
+     color = leadingSpanA > leadingSpanB ? color.new(color.teal, transp=70) : color.new(color.red, transp=70)) 
+
+// --- Ligne de conversion (Tenkan-sen) et ligne de base (Kijun-sen) ---
+plot(conversionLine, color=color.blue, title="Tenkan-sen (Conversion Line)")
+plot(baseLine, color=color.fuchsia, title="Kijun-sen (Base Line)") 
+
+// --- Chikou Span (Lagging Span) ---
+plot(close, offset = -displacement, color=color.gray, title="Chikou Span (Lagging Span)")
+
